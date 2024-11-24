@@ -15,7 +15,7 @@ class MomentEntryPage extends StatefulWidget {
   final Moment? updateMoment;
 
   @override
-  _MomentEntryPageState createState() => _MomentEntryPageState();
+  State<MomentEntryPage> createState() => _MomentEntryPageState();
 }
 
 class _MomentEntryPageState extends State<MomentEntryPage> {

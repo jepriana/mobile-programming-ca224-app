@@ -1,5 +1,6 @@
 import 'package:faker/faker.dart' as faker;
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
 import 'package:collection/collection.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:myapp/models/moment.dart';

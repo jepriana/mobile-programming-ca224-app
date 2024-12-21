@@ -12,9 +12,9 @@ part 'user_data_state.dart';
 
 class UserDataBloc extends Bloc<UserDataEvent, UserDataState> {
   final AbsApiUserDataRepository _apiUserDataRepository;
-  List<Moment> _moments = [];
-  List<User> _followers = [];
-  List<User> _following = [];
+   List<Moment> _moments = [];
+   List<User> _followers = [];
+   List<User> _following = [];
   UserDataBloc(this._apiUserDataRepository) : super(UserDataInitial()) {
     on<UserDataGetEvent>(userDataGetEvent);
     on<UserDataGetMomentEvent>(userDataGetMomentEvent);
@@ -46,8 +46,8 @@ class UserDataBloc extends Bloc<UserDataEvent, UserDataState> {
       UserDataGetMomentEvent event, Emitter<UserDataState> emit) async {
     emit(UserDataGetMomentLoadingState());
     try {
-      _moments = await _apiUserDataRepository.getMoments();
-      emit(UserDataGetMomentSuccessState(_moments));
+      final moments = await _apiUserDataRepository.getMoments();
+      emit(UserDataGetMomentSuccessState(moments));
     } catch (e) {
       log(e.toString(), name: "UserDataBloc:userDataGetMomentEvent");
       emit(const UserDataGetMomentFailedActionState('Failed to get moments.'));
@@ -58,8 +58,8 @@ class UserDataBloc extends Bloc<UserDataEvent, UserDataState> {
       UserDataGetFollowerEvent event, Emitter<UserDataState> emit) async {
     emit(UserDataGetFollowerLoadingState());
     try {
-      _followers = await _apiUserDataRepository.getFollowers();
-      emit(UserDataGetFollowerSuccessState(_followers));
+      final followers = await _apiUserDataRepository.getFollowers();
+      emit(UserDataGetFollowerSuccessState(followers));
     } catch (e) {
       log(e.toString(), name: "UserDataBloc:userDataGetFollowerEvent");
       emit(const UserDataGetFollowerFailedActionState(
@@ -71,8 +71,8 @@ class UserDataBloc extends Bloc<UserDataEvent, UserDataState> {
       UserDataGetFollowingEvent event, Emitter<UserDataState> emit) async {
     emit(UserDataGetFollowingLoadingState());
     try {
-      _following = await _apiUserDataRepository.getFollowing();
-      emit(UserDataGetFollowingSuccessState(_following));
+      final following = await _apiUserDataRepository.getFollowing();
+      emit(UserDataGetFollowingSuccessState(following));
     } catch (e) {
       log(e.toString(), name: "UserDataBloc:userDataGetFollowingEvent");
       emit(const UserDataGetFollowingFailedActionState(

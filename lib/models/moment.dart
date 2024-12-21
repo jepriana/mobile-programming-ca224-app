@@ -91,8 +91,8 @@ class Moment {
         momentDate: DateTime.parse(json["momentDate"]),
         caption: json["caption"],
         location: json["location"],
-        longitude: json["longitude"]?.toDouble(),
-        latitude: json["latitude"]?.toDouble(),
+        longitude: json["longitude"],
+        latitude: json["latitude"],
         imageUrl: json["imageUrl"],
         totalLikes: json["totalLikes"],
         totalComments: json["totalComments"],
@@ -118,14 +118,5 @@ class Moment {
         "totalBookmarks": totalBookmarks,
         "createdAt": createdAt.toIso8601String(),
         "lastUpdatedAt": lastUpdatedAt.toIso8601String(),
-      };
-
-  Map<String, dynamic> toDto() => {
-        "momentDate": momentDate.toIso8601String(),
-        "caption": caption,
-        "location": location,
-        "longitude": longitude,
-        "latitude": latitude,
-        "imageUrl": imageUrl,
       };
 }

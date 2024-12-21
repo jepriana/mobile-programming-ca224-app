@@ -1,7 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myapp/repositories/api/api_user_data_repository.dart';
-import 'package:myapp/repositories/contracts/abs_api_moment_repository.dart';
-import '../../repositories/api/api_moment_repository.dart';
 import '../../repositories/contracts/abs_api_user_data_repository.dart';
 import '../../repositories/contracts/abs_auth_repository.dart';
 import '../../repositories/contracts/abs_moment_repository.dart';
@@ -18,8 +16,5 @@ final repositoryProvider = [
   ),
   RepositoryProvider<AbsApiUserDataRepository>(
     create: (context) => ApiUserDataRepository(),
-  ),
-  RepositoryProvider<AbsApiMomentRepository>(
-    create: (context) => ApiMomentRepository(),
   ),
 ];

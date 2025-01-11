@@ -3,6 +3,8 @@ import 'package:myapp/core/helpers/shared_preference_manager.dart';
 import 'package:myapp/repositories/api/api_user_data_repository.dart';
 import 'package:myapp/repositories/contracts/abs_api_moment_repository.dart';
 import '../../repositories/api/api_moment_repository.dart';
+import '../../repositories/api/api_upload_repository.dart';
+import '../../repositories/contracts/abs_api_upload_repository.dart';
 import '../../repositories/contracts/abs_api_user_data_repository.dart';
 import '../../repositories/contracts/abs_auth_repository.dart';
 import '../../repositories/contracts/abs_moment_repository.dart';
@@ -25,5 +27,8 @@ final repositoryProvider = [
   ),
   RepositoryProvider<AbsApiMomentRepository>(
     create: (context) => ApiMomentRepository(),
+  ),
+  RepositoryProvider<AbsApiUploadRepository>(
+    create: (context) => ApiUploadRepository(),
   ),
 ];

@@ -5,6 +5,8 @@ import 'package:myapp/models/moment.dart';
 import 'package:myapp/core/resources/colors.dart';
 import 'package:myapp/core/resources/dimensions.dart';
 
+import '../../common/pages/location_input_page.dart';
+import '../../common/widgets/input_image.dart';
 import '../bloc/moment_bloc.dart';
 
 class MomentEntryPage extends StatefulWidget {
@@ -30,7 +32,6 @@ class _MomentEntryPageState extends State<MomentEntryPage> {
   final _ctrlMomentDate = TextEditingController();
   final _ctrlLocation = TextEditingController();
   final _ctrlCaption = TextEditingController();
-  final _ctrlImageUrl = TextEditingController();
 
   Moment? _updatedMoment;
 
@@ -47,7 +48,6 @@ class _MomentEntryPageState extends State<MomentEntryPage> {
     _updatedMoment = moment;
     _ctrlMomentDate.text = _dateFormat.format(moment.momentDate);
     _ctrlLocation.text = moment.location;
-    _ctrlImageUrl.text = moment.imageUrl;
     _ctrlCaption.text = moment.caption;
   }
 
@@ -55,7 +55,6 @@ class _MomentEntryPageState extends State<MomentEntryPage> {
   void dispose() {
     _ctrlMomentDate.dispose();
     _ctrlCaption.dispose();
-    _ctrlImageUrl.dispose();
     _ctrlLocation.dispose();
     super.dispose();
   }
@@ -67,14 +66,18 @@ class _MomentEntryPageState extends State<MomentEntryPage> {
       _formKey.currentState!.save();
       // Menyimpan object moment ke list _moments
       if (widget.momentId != null && _updatedMoment != null) {
-        context
-            .read<MomentBloc>()
-            .add(MomentUpdateEvent(_updatedMoment!.copyWith(
-              location: _momentState['location'],
-              momentDate: _momentState['momentDate'],
-              caption: _momentState['caption'],
-              imageUrl: _momentState['imageUrl'],
-            )));
+        context.read<MomentBloc>().add(
+              MomentUpdateEvent(
+                _updatedMoment!.copyWith(
+                  location: _momentState['location'],
+                  momentDate: _momentState['momentDate'],
+                  caption: _momentState['caption'],
+                  imageUrl: _momentState['imageUrl'],
+                  latitude: _momentState['latitude'],
+                  longitude: _momentState['longitude'],
+                ),
+              ),
+            );
       } else {
         // Membuat object moment baru
         final newMoment = Moment(
@@ -82,6 +85,8 @@ class _MomentEntryPageState extends State<MomentEntryPage> {
           momentDate: _momentState['momentDate'],
           caption: _momentState['caption'],
           imageUrl: _momentState['imageUrl'],
+          latitude: _momentState['latitude'],
+          longitude: _momentState['longitude'],
         );
         context.read<MomentBloc>().add(MomentAddEvent(newMoment));
       }
@@ -130,6 +135,13 @@ class _MomentEntryPageState extends State<MomentEntryPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  InputImage(
+                    key: UniqueKey(),
+                    onSelectImage: (imageUrl) {
+                      _momentState['imageUrl'] = imageUrl;
+                    },
+                    imageUrl: _momentState['imageUrl'],
+                  ),
                   const Text('Moment Date'),
                   TextFormField(
                     controller: _ctrlMomentDate,
@@ -159,28 +171,54 @@ class _MomentEntryPageState extends State<MomentEntryPage> {
                         _pickDate(DateTime.tryParse(_ctrlMomentDate.text)),
                   ),
                   const Text('Location'),
-                  TextFormField(
-                    controller: _ctrlLocation,
-                    keyboardType: TextInputType.streetAddress,
-                    textInputAction: TextInputAction.next,
-                    decoration: const InputDecoration(
-                      hintText: 'Enter moment location',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.zero,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _ctrlLocation,
+                          keyboardType: TextInputType.streetAddress,
+                          textInputAction: TextInputAction.next,
+                          decoration: const InputDecoration(
+                            hintText: 'Enter moment location',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.zero,
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter moment location';
+                            }
+                            return null;
+                          },
+                          onSaved: (newValue) {
+                            // Bila nama kreator tidak kosong maka simpan ke object map
+                            if (newValue != null) {
+                              _momentState['location'] = newValue.toString();
+                            }
+                          },
+                        ),
                       ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter moment location';
-                      }
-                      return null;
-                    },
-                    onSaved: (newValue) {
-                      // Bila nama kreator tidak kosong maka simpan ke object map
-                      if (newValue != null) {
-                        _momentState['location'] = newValue.toString();
-                      }
-                    },
+                      const SizedBox(width: mediumSize),
+                      IconButton(
+                        icon: const Icon(Icons.location_searching),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => LocationInputPage(
+                                onLocationSelected:
+                                    (location, latitude, longitude) {
+                                  _momentState['location'] = location;
+                                  _momentState['latitude'] = latitude;
+                                  _momentState['longitude'] = longitude;
+                                  _ctrlCaption.text = location;
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                   const Text('Caption'),
                   TextFormField(
@@ -204,33 +242,6 @@ class _MomentEntryPageState extends State<MomentEntryPage> {
                       if (newValue != null) {
                         _momentState['caption'] = newValue.toString();
                       }
-                    },
-                  ),
-                  const Text('Image URL'),
-                  TextFormField(
-                    controller: _ctrlImageUrl,
-                    keyboardType: TextInputType.url,
-                    textInputAction: TextInputAction.send,
-                    decoration: const InputDecoration(
-                      hintText: 'Enter moment image URL',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.zero,
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter moment image URL';
-                      }
-                      return null;
-                    },
-                    onSaved: (newValue) {
-                      // Bila nama kreator tidak kosong maka simpan ke object map
-                      if (newValue != null) {
-                        _momentState['imageUrl'] = newValue.toString();
-                      }
-                    },
-                    onFieldSubmitted: (value) {
-                      _saveMoment();
                     },
                   ),
                   const SizedBox(height: largeSize),

@@ -46,6 +46,9 @@ class _MomentEntryPageState extends State<MomentEntryPage> {
 
   void _initExistingData(Moment moment) {
     _updatedMoment = moment;
+    _momentState['imageUrl'] = moment.imageUrl;
+    _momentState['latitude'] = moment.latitude;
+    _momentState['longitude'] = moment.longitude;
     _ctrlMomentDate.text = _dateFormat.format(moment.momentDate);
     _ctrlLocation.text = moment.location;
     _ctrlCaption.text = moment.caption;
@@ -121,13 +124,13 @@ class _MomentEntryPageState extends State<MomentEntryPage> {
         title: Text('${widget.momentId != null ? 'Update' : 'Create'} Moment'),
         centerTitle: true,
       ),
-      body: BlocListener<MomentBloc, MomentState>(
+      body: BlocConsumer<MomentBloc, MomentState>(
         listener: (context, state) {
           if (state is MomentGetByIdSuccessActionState) {
             _initExistingData(state.moment);
           }
         },
-        child: SingleChildScrollView(
+        builder: (context, state) => SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: largeSize),
             child: Form(
@@ -211,7 +214,7 @@ class _MomentEntryPageState extends State<MomentEntryPage> {
                                   _momentState['location'] = location;
                                   _momentState['latitude'] = latitude;
                                   _momentState['longitude'] = longitude;
-                                  _ctrlCaption.text = location;
+                                  _ctrlLocation.text = location;
                                 },
                               ),
                             ),

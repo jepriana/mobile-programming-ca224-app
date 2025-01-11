@@ -4,6 +4,9 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../../../repositories/contracts/abs_api_upload_repository.dart';
 
 class InputImage extends StatefulWidget {
@@ -33,11 +36,21 @@ class _InputImageState extends State<InputImage> {
   }
 
   Future<bool> _requestPermission() async {
-    // TODO: check and request permission
+    final permissionResults = await [
+      Permission.camera,
+      Permission.photos,
+      Permission.storage,
+    ].request();
+    if (permissionResults[Permission.camera] == PermissionStatus.granted &&
+        (permissionResults[Permission.photos] == PermissionStatus.granted ||
+            permissionResults[Permission.storage] ==
+                PermissionStatus.granted)) {
+      return true;
+    }
     return false;
   }
 
-  Future<void> _pickImage() async {
+  Future<void> _pickImage(ImageSource source) async {
     try {
       if (Platform.isAndroid) {
         final isPermissionGranted = await _requestPermission();
@@ -45,8 +58,27 @@ class _InputImageState extends State<InputImage> {
           return;
         }
       }
-
-      // TODO: pick and crop image
+      // Pick or capture a photo
+      final picker = ImagePicker();
+      final pickedImage = await picker.pickImage(
+        source: source,
+        maxHeight: 1200,
+        maxWidth: 1600,
+        imageQuality: 90,
+      );
+      // Crop the image if exists
+      if (pickedImage != null) {
+        final imageFile = File(pickedImage.path);
+        // Crop the image
+        final croppedImage = await ImageCropper().cropImage(
+          sourcePath: imageFile.path,
+          aspectRatio: CropAspectRatio(ratioX: 4, ratioY: 3),
+        );
+        // Upload the image
+        if (croppedImage != null) {
+          _uploadImage(File(croppedImage.path));
+        }
+      }
     } catch (e) {
       log(e.toString(), name: 'InputImage:_pickImage');
     }
@@ -103,14 +135,14 @@ class _InputImageState extends State<InputImage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             TextButton.icon(
-              onPressed: () {},
+              onPressed: () => _pickImage(ImageSource.gallery),
               label: const Text('Browse Image'),
               icon: const Icon(
                 Icons.image_search_rounded,
               ),
             ),
             TextButton.icon(
-              onPressed: () {},
+              onPressed: () => _pickImage(ImageSource.camera),
               label: const Text('Capture Image'),
               icon: const Icon(
                 Icons.camera_alt_rounded,

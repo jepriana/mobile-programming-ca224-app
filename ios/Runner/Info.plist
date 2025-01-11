@@ -45,5 +45,15 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>The app uses the photo library to get moment picture.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>The app uses the camera to take moment picture.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>The app uses the microphone to record audio.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs access to location when open.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app needs access to location when in the background.</string>
 </dict>
 </plist>
